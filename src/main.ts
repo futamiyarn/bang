@@ -60,7 +60,7 @@ function getFallbackBang(): string {
     }
   }
   
-  return localStorage.getItem("default-bang") ?? "bang";
+  return localStorage.getItem("default-bang") ?? "ddg";
 }
 
 function noSearchDefaultPageRender() {
@@ -382,9 +382,10 @@ function render404Page(bangToken: string, query: string) {
   let searchUrl;
   let engineName = "Default Search";
   
-  if (fallbackBang === "bang" || fallbackBang === "help") {
+  if (fallbackBang === "bang" || fallbackBang === "help" || window.location.pathname === "/help" || window.location.pathname === "/bang") {
     engineName = "b@ng Directory";
-    searchUrl = cleanQuery ? `/?q=${encodeURIComponent(cleanQuery)}` : "/";
+    const targetPath = window.location.pathname === "/help" || window.location.pathname === "/bang" ? window.location.pathname : "/";
+    searchUrl = cleanQuery ? `${targetPath}?q=${encodeURIComponent(cleanQuery)}` : targetPath;
   } else {
     engineName = (fallbackEngine as any).name || (fallbackEngine as any).s || "Default Search";
     if (cleanQuery === "") {
@@ -465,7 +466,7 @@ function getBangredirectUrl() {
     }
   } else {
     const fallbackBangToken = getFallbackBang();
-    if (fallbackBangToken === "bang" || fallbackBangToken === "help") {
+    if (fallbackBangToken === "bang" || fallbackBangToken === "help" || url.pathname === "/help" || url.pathname === "/bang") {
       renderHelpPage(query);
       return null;
     }
