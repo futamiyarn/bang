@@ -30450,12 +30450,12 @@ export const bangs = [
   },
   {
     c: "Entertainment",
-    d: "www.epicgames.com",
+    d: "store.epicgames.com",
     r: 46,
     s: "Epic Games Store",
     sc: "Games (specific)",
     t: "egs",
-    u: "https://www.epicgames.com/store/en-US/store-search?q={{{s}}}",
+    u: "https://store.epicgames.com/en-US/browse?q={{{s}}}",
   },
   {
     c: "Tech",
@@ -32385,12 +32385,12 @@ export const bangs = [
   },
   {
     c: "Entertainment",
-    d: "www.epicgames.com",
+    d: "store.epicgames.com",
     r: 36,
-    s: "Epic Games",
+    s: "Epic Games Store",
     sc: "Games (specific)",
     t: "epic",
-    u: "https://www.epicgames.com/bing-search?keyword={{{s}}}",
+    u: "https://store.epicgames.com/en-US/browse?q={{{s}}}",
   },
   {
     c: "Tech",

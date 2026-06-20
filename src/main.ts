@@ -38,20 +38,24 @@ for (let i = 0; i < bangs.length; i++) {
 
 function getFallbackBang(): string {
   const url = new URL(window.location.href);
-  const sParam = url.searchParams.get("s")?.toLowerCase().trim();
+  const sParam = url.searchParams.get("s");
   
-  if (sParam) {
+  if (url.searchParams.has("s")) {
+    const cleanS = sParam?.toLowerCase().trim() ?? "";
+    if (cleanS === "") {
+      return "ddg";
+    }
     const found = SEARCH_ENGINES.find(
-      (e) => e.alias.includes(sParam) || e.bang === sParam
+      (e) => e.alias.includes(cleanS) || e.bang === cleanS
     );
     if (found) {
       return found.bang;
     }
-    const foundBang = bangs.find((b) => b.t === sParam);
+    const foundBang = bangs.find((b) => b.t === cleanS);
     if (foundBang) {
       return foundBang.t;
     }
-    if (sParam === "kagi") {
+    if (cleanS === "kagi") {
       return "kagi";
     }
   }
@@ -364,14 +368,38 @@ function render404Page(bangToken: string, query: string) {
   const app = document.querySelector<HTMLDivElement>("#app")!;
   
   const fallbackBang = getFallbackBang();
-  const fallbackEngine = SEARCH_ENGINES.find(e => e.bang === fallbackBang) ?? SEARCH_ENGINES[0];
-  const selectedBang = bangs.find(b => b.t === fallbackBang) || (fallbackBang === "kagi" ? kagiBang : undefined) || bangs.find(b => b.t === "ddg")!;
+  const fallbackEngine = SEARCH_ENGINES.find(e => e.bang === fallbackBang) ?? 
+                         bangs.find(b => b.t === fallbackBang) ?? 
+                         (fallbackBang === "kagi" ? kagiBang : undefined) ?? 
+                         SEARCH_ENGINES[0];
+                         
+  const selectedBang = bangs.find(b => b.t === fallbackBang) || 
+                       (fallbackBang === "kagi" ? kagiBang : undefined) || 
+                       bangs.find(b => b.t === "ddg")!;
   
-  const cleanQuery = query.trim();
-  const searchUrl = selectedBang.u.replace(
-    "{{{s}}}",
-    encodeURIComponent(cleanQuery).replace(/%2F/g, "/"),
-  );
+  const cleanQuery = query.replace(/!\S+\s*/i, "").trim();
+  
+  let searchUrl;
+  let engineName = "Default Search";
+  
+  if (fallbackBang === "bang" || fallbackBang === "help") {
+    engineName = "b@ng Directory";
+    searchUrl = cleanQuery ? `/?q=${encodeURIComponent(cleanQuery)}` : "/";
+  } else {
+    engineName = (fallbackEngine as any).name || (fallbackEngine as any).s || "Default Search";
+    if (cleanQuery === "") {
+      searchUrl = `https://${selectedBang.d}`;
+    } else {
+      searchUrl = selectedBang.u.replace(
+        "{{{s}}}",
+        encodeURIComponent(cleanQuery).replace(/%2F/g, "/"),
+      );
+    }
+  }
+  
+  const buttonText = cleanQuery 
+    ? `Search for "${escapeHtml(cleanQuery)}" on ${escapeHtml(engineName)}`
+    : `Go to ${escapeHtml(engineName)}`;
   
   app.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
@@ -382,7 +410,7 @@ function render404Page(bangToken: string, query: string) {
         
         <div class="error-actions">
           <a href="${searchUrl}" class="action-btn primary-btn">
-            Search for "${cleanQuery}" on ${fallbackEngine.name}
+            ${buttonText}
           </a>
           <a href="/" class="action-btn secondary-btn">
             Back to homepage
