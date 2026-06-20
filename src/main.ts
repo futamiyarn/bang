@@ -271,6 +271,7 @@ function renderHelpPage(initialSearchTerm: string) {
       const pos = itemPositions[i];
       const allWithSameUrl = urlToBangsMap.get(b.u) || [];
       const alternatives = allWithSameUrl.filter(alt => alt.t !== b.t);
+      alternatives.sort((a, b) => a.t.localeCompare(b.t));
       
       const alternativesHtml = alternatives.length > 0
         ? `<div class="help-result-alternatives">
@@ -319,6 +320,8 @@ function renderHelpPage(initialSearchTerm: string) {
         currentResults.push(b);
       }
     }
+    
+    currentResults.sort((a, b) => a.t.localeCompare(b.t));
     
     // Reset scroll top when query changes
     resultsList.scrollTop = 0;
